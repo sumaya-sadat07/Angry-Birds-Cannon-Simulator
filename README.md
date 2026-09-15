@@ -3,7 +3,7 @@
 An interactive physics-based cannon simulator web application inspired by Angry Birds.
 
 1. Live Demo:
-Try out the live simulator directly in your browser:  **[Play Angry Birds Cannon Simulator](https://sumaya-sadat07.github.io/Angry-Birds-Canon-Simulator/)**
+Try out the live simulator directly in your browser:  **[Play Angry Birds Cannon Simulator](https://sumaya-sadat07.github.io/Angry-Birds-Cannon-Simulator/)**
 
 2. Tech Stack:
 * **HTML5**
