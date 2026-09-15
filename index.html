@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angry Birds Physics Cannon</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #1e1e24;
+      color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .simulator-container {
+      width: 100%;
+      max-width: 1100px;
+      background: #2b2d42;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #3d405b;
+      padding-bottom: 10px;
+    }
+
+    .header h1 {
+      color: #e63946;
+      letter-spacing: 1px;
+    }
+
+    .main-content {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .control-panel {
+      flex: 1;
+      min-width: 280px;
+      background: #1d1e2c;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 0.95rem;
+      color: #a8dadc;
+    }
+
+    input[type="range"] {
+      accent-color: #e63946;
+      cursor: pointer;
+    }
+
+    .fire-button {
+      background: #e63946;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .fire-button:hover {
+      background: #d62828;
+    }
+
+    .fire-button:active {
+      transform: scale(0.98);
+    }
+
+    .metrics-panel {
+      background: #2b2d42;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 4px solid #f4a261;
+    }
+
+    .metrics-panel h3 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: #f4a261;
+    }
+
+    .metrics-panel p {
+      font-size: 0.9rem;
+      margin: 4px 0;
+    }
+
+    .canvas-wrapper {
+      flex: 2.5;
+      min-width: 500px;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #3d405b;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="simulator-container">
+    <header class="header">
+      <h1>🎯 ANGRY BIRDS CANNON SIMULATOR</h1>
+      <p>Precision Physics Launcher & Ballistics Controller</p>
+    </header>
+
+    <div class="main-content">
+      <div class="control-panel">
+        <h2>Launch Parameters</h2>
+        
+        <div class="control-group">
+          <label for="velocity">Velocity (u): <span id="val-velocity">83</span> m/s</label>
+          <input type="range" id="velocity" min="10" max="150" value="83">
+        </div>
+
+        <div class="control-group">
+          <label for="angle">Angle (θ): <span id="val-angle">61</span>°</label>
+          <input type="range" id="angle" min="5" max="85" value="61">
+        </div>
+
+        <div class="control-group">
+          <label for="gravity">Gravity (g): <span id="val-gravity">9.8</span> m/s²</label>
+          <input type="range" id="gravity" min="1" max="25" step="0.1" value="9.8">
+        </div>
+
+        <button id="fire-btn" class="fire-button">FIRE! 💥</button>
+
+        <div class="metrics-panel">
+          <h3>Telemetry Data</h3>
+          <p>Flight Time: <strong id="time-out">0.00</strong> s</p>
+          <p>Max Height: <strong id="height-out">0.00</strong> m</p>
+          <p>Total Distance: <strong id="dist-out">0.00</strong> m</p>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="simCanvas" width="800" height="500"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const velInput = document.getElementById('velocity');
+    const angleInput = document.getElementById('angle');
+    const gravInput = document.getElementById('gravity');
+
+    const velVal = document.getElementById('val-velocity');
+    const angleVal = document.getElementById('val-angle');
+    const gravVal = document.getElementById('val-gravity');
+
+    const timeOut = document.getElementById('time-out');
+    const heightOut = document.getElementById('height-out');
+    const distOut = document.getElementById('dist-out');
+    const fireBtn = document.getElementById('fire-btn');
+
+    velInput.addEventListener('input', e => velVal.textContent = e.target.value);
+    angleInput.addEventListener('input', e => angleVal.textContent = e.target.value);
+    gravInput.addEventListener('input', e => gravVal.textContent = e.target.value);
+
+    let animationId = null;
+
+    function drawBackground() {
+      // Sky Gradient
+      let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      sky.addColorStop(0, '#4a90e2');
+      sky.addColorStop(1, '#87ceeb');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Ground
+      ctx.fillStyle = '#4caf50';
+      ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+
+      // Slingshot / Base
+      ctx.fillStyle = '#5d4037';
+      ctx.fillRect(35, canvas.height - 90, 10, 50);
+      ctx.fillRect(25, canvas.height - 100, 30, 12);
+    }
+
+    function drawBird(x, y) {
+      // Body (Red Bird)
+      ctx.fillStyle = '#e63946';
+      ctx.beginPath();
+      ctx.arc(x, y, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly
+      ctx.fillStyle = '#f4a261';
+      ctx.beginPath();
+      ctx.arc(x, y + 3, 9, 0, Math.PI);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x + 5, y - 3, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(x + 6, y - 3, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Beak
+      ctx.fillStyle = '#f9c74f';
+      ctx.beginPath();
+      ctx.moveTo(x + 8, y + 1);
+      ctx.lineTo(x + 18, y + 4);
+      ctx.lineTo(x + 8, y + 8);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function calculatePhysics(u, thetaDeg, g) {
+      const theta = (thetaDeg * Math.PI) / 180;
+      const totalTime = (2 * u * Math.sin(theta)) / g;
+      const maxHeight = (u * u * Math.sin(theta) * Math.sin(theta)) / (2 * g);
+      const distance = (u * u * Math.sin(2 * theta)) / g;
+
+      return { totalTime, maxHeight, distance, theta };
+    }
+
+    function animateLaunch() {
+      if (animationId) cancelAnimationFrame(animationId);
+
+      const u = parseFloat(velInput.value);
+      const thetaDeg = parseFloat(angleInput.value);
+      const g = parseFloat(gravInput.value);
+
+      const { totalTime, maxHeight, distance, theta } = calculatePhysics(u, thetaDeg, g);
+
+      timeOut.textContent = totalTime.toFixed(2);
+      heightOut.textContent = maxHeight.toFixed(2);
+      distOut.textContent = distance.toFixed(2);
+
+      let t = 0;
+      const dt = 0.04;
+      const trajectory = [];
+
+      const scaleX = (canvas.width - 100) / Math.max(distance, 50);
+      const scaleY = (canvas.height - 120) / Math.max(maxHeight, 20);
+
+      function step() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+
+        const x = u * Math.cos(theta) * t;
+        const y = u * Math.sin(theta) * t - 0.5 * g * t * t;
+
+        const screenX = 40 + x * scaleX;
+        const screenY = (canvas.height - 40) - y * scaleY;
+
+        if (y >= 0 && t <= totalTime) {
+          trajectory.push({ x: screenX, y: screenY });
+
+          // Trajectory Trail
+          ctx.strokeStyle = 'rgba(230, 57, 70, 0.7)';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([6, 6]);
+          ctx.beginPath();
+          for (let i = 0; i < trajectory.length; i++) {
+            if (i === 0) ctx.moveTo(trajectory[i].x, trajectory[i].y);
+            else ctx.lineTo(trajectory[i].x, trajectory[i].y);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Draw Bird
+          drawBird(screenX, screenY);
+
+          t += dt;
+          animationId = requestAnimationFrame(step);
+        } else {
+          // Final Trail Render
+          ctx.strokeStyle = 'rgba(230, 57, 70, 0.7)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          for (let i = 0; i < trajectory.length; i++) {
+            if (i === 0) ctx.moveTo(trajectory[i].x, trajectory[i].y);
+            else ctx.lineTo(trajectory[i].x, trajectory[i].y);
+          }
+          ctx.stroke();
+          drawBird(screenX, canvas.height - 40);
+        }
+      }
+
+      step();
+    }
+
+    fireBtn.addEventListener('click', animateLaunch);
+    drawBackground();
+    drawBird(40, canvas.height - 100);
+  </script>
+</body>
+</html>
