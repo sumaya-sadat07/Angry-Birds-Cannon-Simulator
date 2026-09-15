@@ -14,8 +14,3 @@ Try out the live simulator directly in your browser:  **[Play Angry Birds Cannon
 * Interactive cannon controls and smooth projectile animation
 * Responsive design that runs directly in any modern browser without installation
 
-4. How to Run Locally:
- **Clone the repository:**
-   ```bash
-   git clone [https://github.com/sumaya-sadat07/Angry-Birds-Canon-Simulator.git](https://github.com/sumaya-sadat07/Angry-Birds-Canon-Simulator.git)
-   
