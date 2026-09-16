@@ -3,90 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Angry Birds Cannon Simulator</title>
+  <title>Angry Birds Cannon Simulator - Kids Edition</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Fredoka', 'Segoe UI', Tahoma, sans-serif;
     }
 
     body {
-      background: #1a1a2e;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 15px;
     }
 
     h1 {
-      margin-bottom: 20px;
-      color: #e63946;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      margin-bottom: 10px;
+      color: #ffcc00;
+      text-shadow: 3px 3px 0px #d63031, 5px 5px 10px rgba(0,0,0,0.5);
+      font-size: 2.2rem;
+      text-align: center;
     }
 
     .container {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 15px;
       justify-content: center;
-      max-width: 1200px;
+      max-width: 1100px;
       width: 100%;
     }
 
     .controls-panel {
-      background: #16213e;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       flex: 1;
       min-width: 280px;
-      max-width: 350px;
+      max-width: 340px;
     }
 
     .control-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #a8dede;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #74b9ff;
+      font-size: 1.1rem;
     }
 
     input[type="range"] {
       width: 100%;
-      height: 6px;
-      background: #0f3460;
+      height: 10px;
+      background: #0984e3;
       border-radius: 5px;
       outline: none;
+      cursor: pointer;
     }
 
     .value-display {
       float: right;
-      color: #e63946;
+      color: #ffeaa7;
       font-weight: bold;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
     }
 
     button {
-      width: 100%;
+      flex: 1;
       padding: 12px;
-      background: #e63946;
+      background: #ff7675;
       color: white;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
+      box-shadow: 0 5px 0 #d63031;
+      transition: all 0.1s ease;
     }
 
-    button:hover {
-      background: #c1121f;
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #d63031;
+    }
+
+    #resetBtn {
+      background: #74b9ff;
+      box-shadow: 0 5px 0 #0984e3;
     }
 
     .simulation-area {
@@ -98,23 +116,37 @@
     }
 
     canvas {
-      background: linear-gradient(to bottom, #1d3557, #457b9d);
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       width: 100%;
       height: auto;
-      max-width: 800px;
+      max-width: 750px;
+      border: 4px solid #fff;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 750px;
+      margin-bottom: 10px;
+      background: #6c5ce7;
+      padding: 10px 20px;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #ffeaa7;
     }
 
     .telemetry {
       display: flex;
       justify-content: space-around;
       width: 100%;
-      max-width: 800px;
-      margin-top: 15px;
-      background: #16213e;
-      padding: 15px;
-      border-radius: 10px;
+      max-width: 750px;
+      margin-top: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      border-radius: 15px;
     }
 
     .telemetry-card {
@@ -123,41 +155,49 @@
 
     .telemetry-card span {
       display: block;
-      font-size: 14px;
-      color: #8d99ae;
+      font-size: 0.85rem;
+      color: #dfe6e9;
     }
 
     .telemetry-card strong {
-      font-size: 18px;
-      color: #f1faee;
+      font-size: 1.1rem;
+      color: #55efc4;
     }
   </style>
 </head>
 <body>
 
-  <h1>Angry Birds Cannon Simulator</h1>
+  <h1>🚀 Angry Birds Physics Target Game 🎯</h1>
 
   <div class="container">
     <div class="controls-panel">
       <div class="control-group">
-        <label>Velocity (u): <span class="value-display" id="velVal">145</span> m/s</label>
-        <input type="range" id="velocity" min="1" max="200" value="145">
+        <label>🚀 Speed: <span class="value-display" id="velVal">145</span> m/s</label>
+        <input type="range" id="velocity" min="10" max="200" value="145">
       </div>
 
       <div class="control-group">
-        <label>Angle (&theta;): <span class="value-display" id="angleVal">12</span>&deg;</label>
-        <input type="range" id="angle" min="1" max="89" value="12">
+        <label>📐 Angle: <span class="value-display" id="angleVal">35</span>&deg;</label>
+        <input type="range" id="angle" min="1" max="89" value="35">
       </div>
 
       <div class="control-group">
-        <label>Gravity (g): <span class="value-display" id="gravVal">5.9</span> m/s&sup2;</label>
-        <input type="range" id="gravity" min="1" max="25" step="0.1" value="5.9">
+        <label>🌍 Gravity: <span class="value-display" id="gravVal">9.8</span> m/s&sup2;</label>
+        <input type="range" id="gravity" min="1" max="25" step="0.1" value="9.8">
       </div>
 
-      <button id="launchBtn">LAUNCH</button>
+      <div class="btn-group">
+        <button id="launchBtn">🔥 LAUNCH!</button>
+        <button id="resetBtn">🔄 NEW TARGET</button>
+      </div>
     </div>
 
     <div class="simulation-area">
+      <div class="score-board">
+        <span>⭐ Score: <span id="score">0</span></span>
+        <span>🎯 Target Distance: <span id="targetDist">--</span>m</span>
+      </div>
+
       <canvas id="simCanvas" width="800" height="400"></canvas>
 
       <div class="telemetry">
@@ -192,10 +232,50 @@
     const timeDisplay = document.getElementById('flightTime');
     const heightDisplay = document.getElementById('maxHeight');
     const distanceDisplay = document.getElementById('totalDistance');
+    const scoreDisplay = document.getElementById('score');
+    const targetDistDisplay = document.getElementById('targetDist');
 
     const launchBtn = document.getElementById('launchBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
     let animationId = null;
+    let score = 0;
+    let targetDistance = 500; // Meters
+    let targetHit = false;
+
+    // Web Audio Synthesizer (No external sound files needed!)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'launch') {
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'hit') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      }
+    }
+
+    function generateRandomTarget() {
+      targetDistance = Math.floor(Math.random() * 800) + 200;
+      targetDistDisplay.textContent = targetDistance;
+      targetHit = false;
+    }
 
     function updateInputValues() {
       velVal.textContent = velocityInput.value;
@@ -216,37 +296,72 @@
       return { rad, time, height, distance };
     }
 
+    function drawBackground() {
+      // Sky
+      let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#74b9ff');
+      gradient.addColorStop(1, '#81ecec');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Clouds
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.beginPath();
+      ctx.arc(150, 60, 25, 0, Math.PI * 2);
+      ctx.arc(175, 50, 35, 0, Math.PI * 2);
+      ctx.arc(200, 60, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(500, 80, 20, 0, Math.PI * 2);
+      ctx.arc(520, 70, 30, 0, Math.PI * 2);
+      ctx.arc(540, 80, 20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     function drawScene(u, angleDeg, g, animationProgress = 1) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
 
       const { rad, time, height, distance } = calculatePhysics(u, angleDeg, g);
 
-      const startX = 50;
+      const startX = 60;
       const startY = canvas.height - 40;
 
-      const availableWidth = canvas.width - 100;
-      const availableHeight = canvas.height - 80;
+      const availableWidth = canvas.width - 120;
+      const availableHeight = canvas.height - 100;
 
-      // Uniform Aspect Ratio Scaling for physically accurate representation
-      const scaleX = availableWidth / Math.max(distance, 10);
-      const scaleY = availableHeight / Math.max(height, 10);
+      // Max scale based on target or calculated distance
+      const maxDist = Math.max(distance, targetDistance + 100);
+      const scaleX = availableWidth / maxDist;
+      const scaleY = availableHeight / Math.max(height, 50);
       const scale = Math.min(scaleX, scaleY);
 
-      // Draw Ground
+      // Draw Grass/Ground
+      ctx.fillStyle = '#00b894';
+      ctx.fillRect(0, startY, canvas.width, 40);
+
+      // Draw Slingshot/Cannon Base
+      ctx.fillStyle = '#636e72';
+      ctx.fillRect(startX - 10, startY - 20, 20, 20);
+
+      // Draw Target Pig / Object
+      const targetCanvasX = startX + targetDistance * scale;
       ctx.beginPath();
-      ctx.moveTo(0, startY);
-      ctx.lineTo(canvas.width, startY);
-      ctx.strokeStyle = '#a8dede';
-      ctx.lineWidth = 3;
+      ctx.arc(targetCanvasX, startY - 15, 15, 0, Math.PI * 2);
+      ctx.fillStyle = targetHit ? '#fdcb6e' : '#55efc4';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#00b894';
       ctx.stroke();
 
-      // Draw Cannon Origin
+      // Target Face
+      ctx.fillStyle = '#2d3436';
       ctx.beginPath();
-      ctx.arc(startX, startY, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#e63946';
+      ctx.arc(targetCanvasX - 5, startY - 18, 2, 0, Math.PI * 2);
+      ctx.arc(targetCanvasX + 5, startY - 18, 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Draw Trajectory
+      // Draw Trajectory Curve
       ctx.beginPath();
       ctx.moveTo(startX, startY);
 
@@ -265,13 +380,13 @@
         ctx.lineTo(drawX, drawY);
       }
 
-      ctx.strokeStyle = '#e63946';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
+      ctx.strokeStyle = '#d63031';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 6]);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Draw Projectile
+      // Draw Bird Projectile
       if (animationProgress > 0) {
         let t = currentMaxTime;
         let x = vx * t;
@@ -280,10 +395,27 @@
         let projX = startX + x * scale;
         let projY = startY - y * scale;
 
+        // Bird Body
         ctx.beginPath();
-        ctx.arc(projX, projY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffb703';
+        ctx.arc(projX, projY, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff7675';
         ctx.fill();
+
+        // Bird Beak
+        ctx.beginPath();
+        ctx.moveTo(projX + 5, projY);
+        ctx.lineTo(projX + 13, projY - 2);
+        ctx.lineTo(projX + 5, projY + 4);
+        ctx.fillStyle = '#fdcb6e';
+        ctx.fill();
+
+        // Target Collision Detection
+        if (Math.abs(x - targetDistance) < 30 && y < 20 && !targetHit) {
+          targetHit = true;
+          score += 100;
+          scoreDisplay.textContent = score;
+          playSound('hit');
+        }
       }
 
       // Telemetry UI Update
@@ -295,6 +427,8 @@
     launchBtn.addEventListener('click', () => {
       if (animationId) cancelAnimationFrame(animationId);
 
+      playSound('launch');
+
       const u = parseFloat(velocityInput.value);
       const angleDeg = parseFloat(angleInput.value);
       const g = parseFloat(gravityInput.value);
@@ -302,7 +436,7 @@
       const { time } = calculatePhysics(u, angleDeg, g);
 
       let startTime = null;
-      const duration = Math.min(Math.max(time * 200, 1000), 4000);
+      const duration = Math.min(Math.max(time * 250, 1200), 4000);
 
       function animate(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -319,7 +453,18 @@
       animationId = requestAnimationFrame(animate);
     });
 
+    resetBtn.addEventListener('click', () => {
+      generateRandomTarget();
+      drawScene(
+        parseFloat(velocityInput.value),
+        parseFloat(angleInput.value),
+        parseFloat(gravityInput.value),
+        1
+      );
+    });
+
     // Initial Load
+    generateRandomTarget();
     updateInputValues();
     drawScene(
       parseFloat(velocityInput.value),
